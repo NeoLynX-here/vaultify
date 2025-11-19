@@ -21,7 +21,7 @@ export default function VaultItem({
   const [editForm, setEditForm] = useState({ ...item, showPassword: false });
   const [copyFeedback, setCopyFeedback] = useState("");
 
-  // ✅ FIXED: Only calculate password strength when needed
+  //  FIXED: Only calculate password strength when needed
   const [editPasswordStrength, setEditPasswordStrength] = useState({
     score: 0,
     strength: "weak",
@@ -39,7 +39,7 @@ export default function VaultItem({
     [item, getDisplayText]
   );
 
-  // ✅ KEEP ORIGINAL VARIABLES FOR BACKWARDS COMPATIBILITY
+  //  KEEP ORIGINAL VARIABLES FOR BACKWARDS COMPATIBILITY
   const displayTitle = displayValues.title;
   const displayUsername = displayValues.username;
   const displayPassword = displayValues.password;
@@ -58,21 +58,21 @@ export default function VaultItem({
     [item, isEncrypted]
   );
 
-  // ✅ KEEP ORIGINAL VARIABLES FOR BACKWARDS COMPATIBILITY
+  //  KEEP ORIGINAL VARIABLES FOR BACKWARDS COMPATIBILITY
   const isTitleEncrypted = encryptionStatus.title;
   const isUsernameEncrypted = encryptionStatus.username;
   const isPasswordEncrypted = encryptionStatus.password;
   const isLinkEncrypted = encryptionStatus.link;
   const isNotesEncrypted = encryptionStatus.notes;
 
-  // ✅ FIXED: Only update edit form when item changes and we're in editing mode
+  //  FIXED: Only update edit form when item changes and we're in editing mode
   useEffect(() => {
     if (isEditing) {
       setEditForm({ ...item, showPassword: false });
     }
   }, [isEditing, item]);
 
-  // ✅ FIXED: Debounced password strength calculation
+  //  FIXED: Debounced password strength calculation
   useEffect(() => {
     if (!isEditing || !editForm.password) {
       return;
@@ -103,7 +103,7 @@ export default function VaultItem({
 
   const handleCancel = useCallback(() => onCancelEdit(), [onCancelEdit]);
 
-  // ✅ FIXED: Memoized form field handlers
+  //  FIXED: Memoized form field handlers
   const handleFieldChange = useCallback((field, value) => {
     setEditForm((prev) => ({ ...prev, [field]: value }));
   }, []);
@@ -447,7 +447,7 @@ export default function VaultItem({
                   </span>
                 </button>
                 <button
-                  onClick={() => handleCopy(displayUsername)}
+                  onClick={() => handleCopy(displayPassword)}
                   className="bg-black border border-pink-600 text-pink-400 hover:bg-pink-600/30 transition-all duration-200 px-2 py-2 flex items-center gap-2 group font-mono text-sm"
                   title="COPY_IDENTITY_KEY"
                 >
