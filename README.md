@@ -354,9 +354,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support & Community
 
-- **Documentation**: [docs.vaultify.com](https://docs.vaultify.com)
+
 - **Issues**: [GitHub Issues](https://github.com/NeoLynX-here/vaultify/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/NeoLynX-here/vaultify/discussions)
 
 ---
 
