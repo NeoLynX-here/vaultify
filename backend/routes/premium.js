@@ -11,42 +11,6 @@ dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
 const router = express.Router();
 
-// ADMIN: Assign premium key (protect this in production!)
-router.post("/assignPremiumKey", async (req, res) => {
-  const { email } = req.body;
-
-  if (!email) {
-    return res.status(400).json({ message: "Missing email" });
-  }
-
-  try {
-    // Check if user exists
-    const userCheck = await pool.query(
-      "SELECT id FROM users WHERE email = $1",
-      [email]
-    );
-
-    if (userCheck.rows.length === 0) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    const premiumKey = crypto.randomBytes(16).toString("hex");
-
-    await pool.query("UPDATE users SET premium_key = $1 WHERE email = $2", [
-      premiumKey,
-      email,
-    ]);
-
-    res.json({
-      message: "Premium key assigned",
-      premiumKey,
-      email,
-    });
-  } catch (err) {
-    console.error(" assignPremiumKey error:", err);
-    res.status(500).json({ message: "Server error" });
-  }
-});
 
 // User verifies premium key
 router.post("/verifyPremium", requireAuth, async (req, res) => {
