@@ -100,13 +100,7 @@ npm install
 
 ## 🗄️ Database Setup (PostgreSQL)
 
-1. Create a PostgreSQL database:
-
-```sql
-CREATE DATABASE vaultify;
-```
-
-2. Run the schema file:
+1. Run the schema file:
 
 ```sh
 psql -U postgres -d vaultify -f vault.sql
