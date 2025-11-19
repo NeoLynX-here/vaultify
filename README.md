@@ -57,8 +57,6 @@ This repo contains **three apps**:
 
 ---
 
----
-
 ## ⚙️ Installation
 
 ### 1️⃣ Clone the repository
@@ -206,5 +204,3 @@ MIT License – feel free to modify and use.
 ## 💬 Contact
 
 For issues or improvements → open an Issue on GitHub.
-
----
