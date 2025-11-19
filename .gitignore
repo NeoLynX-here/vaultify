@@ -25,3 +25,4 @@ vaultify/dist/
 # Backend
 backend/node_modules/
 admin/backend/node_modules/
+*lock.json

@@ -190,14 +190,14 @@ export default function Register() {
 
       {/* Floating binary code particles */}
       <div className="absolute inset-0 overflow-hidden">
-        {[...Array(50)].map((_, i) => (
+        {[...Array(30)].map((_, i) => (
           <div
             key={i}
             className="absolute text-cyan-400 font-mono text-xs opacity-30 animate-float"
             style={{
               left: `${Math.random() * 100}%`,
               animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${15 + Math.random() * 50}s`,
+              animationDuration: `${15 + Math.random() * 20}s`,
             }}
           >
             {Math.random() > 0.5 ? "1" : "0"}
