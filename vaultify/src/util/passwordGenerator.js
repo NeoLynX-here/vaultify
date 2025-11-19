@@ -1,5 +1,3 @@
-import crypto from 'crypto';
-
 export const generateRandomPassword = (options = {}) => {
   const {
     length = 16,
@@ -16,7 +14,12 @@ export const generateRandomPassword = (options = {}) => {
   const symbols = "!@#$%^&*()_+-=[]{}|;:,.<>?";
   const ambiguous = "Il1O0";
 
-  // Filter character sets if avoidAmbiguous is true
+  const cryptoRandom = (max) => {
+    const array = new Uint32Array(1);
+    window.crypto.getRandomValues(array);
+    return array[0] % max;
+  };
+
   const getFilteredSet = (charset) => {
     if (!avoidAmbiguous) return charset;
     return charset
@@ -30,43 +33,34 @@ export const generateRandomPassword = (options = {}) => {
   const filteredNumbers = useNumbers ? getFilteredSet(numbers) : "";
   const filteredSymbols = useSymbols ? getFilteredSet(symbols) : "";
 
-  // Build character sets
-  const requiredChars = [
-    ...(useLowercase ? [filteredLowercase] : []),
-    ...(useUppercase ? [filteredUppercase] : []),
-    ...(useNumbers ? [filteredNumbers] : []),
-    ...(useSymbols ? [filteredSymbols] : []),
-  ].filter((set) => set.length > 0);
+  const requiredSets = [
+    filteredLowercase,
+    filteredUppercase,
+    filteredNumbers,
+    filteredSymbols,
+  ].filter((s) => s.length > 0);
 
-  // Combine all characters for the remaining slots
-  const allChars = requiredChars.join("");
-
-  if (allChars.length === 0) return "";
+  const allChars = requiredSets.join("");
+  if (!allChars.length) return "";
 
   let password = "";
 
-  // Step 1: Ensure at least one character from each selected type
-  requiredChars.forEach((charSet) => {
-    if (charSet.length > 0) {
-      password += charSet[crypto.randomInt(charSet.length)];
-    }
+  // Ensure at least one from each selected category
+  requiredSets.forEach((set) => {
+    password += set[cryptoRandom(set.length)];
   });
 
-  // Step 2: Fill the rest with random characters from all sets
+  // Fill remaining slots
   for (let i = password.length; i < length; i++) {
-    password += allChars[crypto.randomInt(allChars.length)];
+    password += allChars[cryptoRandom(allChars.length)];
   }
 
-  // Step 3: Shuffle the password to mix the required characters
-  return secureShuffle(password.split("")).join("");
+  // Secure shuffle
+  const arr = password.split("");
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = cryptoRandom(i + 1);
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+
+  return arr.join("");
 };
-
-
-// Fisher-Yates shuffle using cryptographically secure random
-function secureShuffle(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = crypto.randomInt(i + 1);
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-}
