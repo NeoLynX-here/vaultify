@@ -297,7 +297,7 @@ npm run build
 2. **Port Already in Use**
    ```bash
    # Find and kill process
-   lsof -ti:3000 | xargs kill -9
+   lsof -ti:5000 | xargs kill -9
    ```
 
 3. **Build Errors**
