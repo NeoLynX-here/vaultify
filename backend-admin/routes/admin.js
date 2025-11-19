@@ -3,11 +3,42 @@ import jwt from "jsonwebtoken";
 import { pool } from "../db.js";
 import crypto from "crypto";
 import dotenv from "dotenv";
+import rateLimit from "express-rate-limit";
 
 dotenv.config();
 const router = express.Router();
 
-// Middleware to verify admin JWT
+/* -----------------------------
+   1. Admin Login Rate Limiter
+------------------------------ */
+const adminLoginLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 5, // Allow 5 attempts / minute
+  message: { error: "Too many login attempts. Try again later." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+/* -----------------------------------------
+   2. Admin API (JWT Protected) Limiter
+------------------------------------------ */
+const adminApiLimiter = rateLimit({
+  windowMs: 15 * 1000, // 15 seconds
+  max: 30, // Allow 30 admin requests per 15s
+  message: { error: "Too many requests from admin." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Apply to all /api/admin/* except login
+router.use((req, res, next) => {
+  if (req.path === "/login") return next();
+  return adminApiLimiter(req, res, next);
+});
+
+/* -----------------------------
+   3. Verify Admin JWT
+------------------------------ */
 function verifyAdmin(req, res, next) {
   const header = req.headers["authorization"];
   if (!header) return res.status(401).json({ error: "Missing token" });
@@ -23,8 +54,10 @@ function verifyAdmin(req, res, next) {
   }
 }
 
-// POST /api/admin/login
-router.post("/login", async (req, res) => {
+/* -----------------------------
+   4. Admin Login (with limiter)
+------------------------------ */
+router.post("/login", adminLoginLimiter, async (req, res) => {
   const { username, password } = req.body;
 
   if (
@@ -41,7 +74,9 @@ router.post("/login", async (req, res) => {
   res.status(401).json({ error: "Unauthorized" });
 });
 
-// GET /api/admin/users
+/* -----------------------------
+   5. Fetch All Users
+------------------------------ */
 router.get("/users", verifyAdmin, async (req, res) => {
   try {
     const result = await pool.query(
@@ -54,7 +89,9 @@ router.get("/users", verifyAdmin, async (req, res) => {
   }
 });
 
-// PATCH /api/admin/users/:id/premium
+/* -----------------------------
+   6. Toggle Premium
+------------------------------ */
 router.patch("/users/:id/premium", verifyAdmin, async (req, res) => {
   const { id } = req.params;
   const { is_premium } = req.body;
@@ -71,10 +108,11 @@ router.patch("/users/:id/premium", verifyAdmin, async (req, res) => {
   }
 });
 
-// NEW: PATCH /api/admin/users/:id/premium-key
+/* -----------------------------
+   7. Generate New Premium Key
+------------------------------ */
 router.patch("/users/:id/premium-key", verifyAdmin, async (req, res) => {
   const { id } = req.params;
-
   const newKey = crypto.randomBytes(16).toString("hex");
 
   try {
@@ -90,7 +128,9 @@ router.patch("/users/:id/premium-key", verifyAdmin, async (req, res) => {
   }
 });
 
-// Optional: reset 2FA
+/* -----------------------------
+   8. Reset 2FA
+------------------------------ */
 router.patch("/users/:id/2fa-reset", verifyAdmin, async (req, res) => {
   const { id } = req.params;
   try {

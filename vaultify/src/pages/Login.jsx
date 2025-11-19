@@ -69,8 +69,7 @@ export default function Login() {
       if (loginJson.twofa_required && loginJson.ticket) {
         console.log("2FA REQUIRED - Showing modal");
         console.log("Ticket:", loginJson.ticket);
-
-      
+    
         const vaultKey = await deriveAesKey(
           password,
           salt,
@@ -78,13 +77,10 @@ export default function Login() {
           250000,
           true
         );
-
-        
+     
         const vaultKeyBase64 = await exportCryptoKeyToBase64(vaultKey);
-
        
         sessionStorage.setItem("vault_key_base64", vaultKeyBase64);
-
         
         setTwoFAData({
           ticket: loginJson.ticket,
@@ -221,6 +217,7 @@ export default function Login() {
     setShowTwoFAModal(false);
     setLoading(false);
   }
+  const isFormValid = email.trim() && password.trim();
 
   return (
     <div className="min-h-screen bg-gray-900 relative overflow-hidden">
@@ -295,7 +292,7 @@ export default function Login() {
                   </label>
                   <input
                     type="email"
-                    className="w-full px-4 py-3 bg-black border border-cyan-500/60 focus:scale-[1.02] hover:scale-[1.01] focus:outline-none focus:border-cyan-400 text-white font-mono transition-all duration-200 shadow-[0_0_15px_rgba(34,211,238,0.2)] focus:shadow-[0_0_20px_rgba(34,211,238,0.4)]"
+                    className="w-full px-4 py-4 bg-black border border-cyan-500/60 focus:scale-[1.02] hover:scale-[1.01] focus:outline-none focus:border-cyan-400 text-white font-mono transition-all duration-200 shadow-[0_0_15px_rgba(34,211,238,0.2)] focus:shadow-[0_0_20px_rgba(34,211,238,0.4)]"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -312,7 +309,7 @@ export default function Login() {
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}
-                      className="w-full px-4 py-3 bg-black border border-cyan-500/60 focus:scale-[1.02] hover:scale-[1.01] focus:outline-none focus:border-cyan-400 text-white font-mono transition-all duration-200 shadow-[0_0_15px_rgba(34,211,238,0.2)] focus:shadow-[0_0_20px_rgba(34,211,238,0.4)] pr-12"
+                      className="w-full px-4 py-4 bg-black border border-cyan-500/60 focus:scale-[1.02] hover:scale-[1.01] focus:outline-none focus:border-cyan-400 text-white font-mono transition-all duration-200 shadow-[0_0_15px_rgba(34,211,238,0.2)] focus:shadow-[0_0_20px_rgba(34,211,238,0.4)] pr-12"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
@@ -333,22 +330,27 @@ export default function Login() {
                     </button>
                   </div>
                 </div>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className={`w-full py-4 font-bold text-lg font-mono transition-all duration-200 border relative overflow-hidden group ${
-                    loading
-                      ? "bg-gray-900 border-gray-700 text-gray-500 cursor-not-allowed"
-                      : "bg-black border-cyan-400 focus:scale-[1.01] hover:bg-gradient-to-r hover:from-cyan-400/10 hover:to-pink-600/10 hover:border-pink-600 text-cyan-400 hover:text-pink-400 shadow-[0_0_20px_rgba(34,211,238,0.3)] hover:shadow-[0_0_25px_rgba(219,39,119,0.4)]"
-                  }`}
-                >
-                  <span className="relative z-10">
-                    {loading ? "LOADING_DATA..." : "INITIATE_ACCESS"}
-                  </span>
-                  {/* Button hover effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/0 via-pink-600/0 to-cyan-400/0 opacity-0 group-hover:opacity-100 group-hover:animate-shimmer transition-opacity duration-300"></div>
-                </button>
+                <div className="flex justify-center mt-8">
+                  <button
+                    type="submit"
+                    disabled={loading || !isFormValid}
+                    className={`w-64 py-4 font-bold text-lg font-mono transition-all duration-200 border relative overflow-hidden group ${
+                      loading || !isFormValid
+                        ? "bg-gray-900 border-gray-700 text-gray-500 cursor-not-allowed"
+                        : "bg-black border-cyan-400 focus:scale-[1.01] hover:bg-gradient-to-r hover:from-cyan-400/10 hover:to-pink-600/10 hover:border-pink-600 text-cyan-400 hover:text-pink-400 shadow-[0_0_20px_rgba(34,211,238,0.3)] hover:shadow-[0_0_25px_rgba(219,39,119,0.4)]"
+                    }`}
+                  >
+                    <span className="relative z-10">
+                      {loading
+                        ? "LOADING_DATA..."
+                        : !isFormValid
+                        ? "ENTER_CREDENTIALS"
+                        : "INITIATE_ACCESS"}
+                    </span>
+                    {/* Button hover effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/0 via-pink-600/0 to-cyan-400/0 opacity-0 group-hover:opacity-100 group-hover:animate-shimmer transition-opacity duration-300"></div>
+                  </button>
+                </div>
               </form>
 
               <div className="text-center mt-6 pt-6 border-t border-cyan-400/20 relative z-10">
@@ -372,12 +374,8 @@ export default function Login() {
               <span>SYSTEM_ONLINE</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)] animate-pulse"></div>
-              <span>PASSWORDS_SAFE</span>
-            </div>
-            <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-pink-600 shadow-[0_0_8px_rgba(219,39,119,0.6)] animate-pulse"></div>
-              <span>CARDS_SECURE</span>
+              <span>VAULT_SECURE</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.6)] animate-pulse"></div>
@@ -395,13 +393,21 @@ export default function Login() {
 
       {/* Security notice */}
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-2xl px-4 z-20">
-        <div className="bg-black/80 border border-cyan-400/30 rounded-none p-4 text-center">
+        <div className="bg-black/80 border border-cyan-400/30 rounded-none p-4 text-center group">
           <p className="text-cyan-400 font-mono text-xs font-bold mb-1">
             DUAL_PROTECTION_VAULT
           </p>
-          <p className="text-cyan-300 font-mono text-xs">
+          <p className="text-cyan-300 font-mono text-xs mb-2">
             PASSWORDS_AND_CARDS_SEPARATELY_ENCRYPTED • END_TO_END_SECURITY
           </p>
+          <a
+            href="https://github.com/NeoLynX-here/vaultify.git"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-pink-500 hover:text-cyan-400 font-mono text-xs transition-all duration-200 hover:tracking-wider group-hover:shadow-[0_0_10px_rgba(34,211,238,0.3)] px-2 py-1"
+          >
+            [ACCESS_SOURCE_CODE]
+          </a>
         </div>
       </div>
 

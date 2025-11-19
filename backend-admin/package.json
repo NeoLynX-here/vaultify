@@ -1,0 +1,32 @@
+{
+  "name": "backend-admin",
+  "version": "1.0.0",
+  "description": "admin backend for vaultify",
+  "type": "module",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NeoLynX-here/vaultify.git"
+  },
+  "author": "Lynx",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/NeoLynX-here/vaultify/issues"
+  },
+  "homepage": "https://github.com/NeoLynX-here/vaultify#readme",
+  "keywords": [],
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.2.1",
+    "jsonwebtoken": "^9.0.2",
+    "nodemon": "^3.1.11",
+    "pg": "^8.16.3"
+  }
+}

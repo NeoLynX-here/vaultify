@@ -124,7 +124,6 @@ export default function Register() {
 
       console.log("Sending registration request without encrypted blob...");
 
-
       const res = await fetch(`${API_BASE}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -191,14 +190,14 @@ export default function Register() {
 
       {/* Floating binary code particles */}
       <div className="absolute inset-0 overflow-hidden">
-        {[...Array(20)].map((_, i) => (
+        {[...Array(50)].map((_, i) => (
           <div
             key={i}
             className="absolute text-cyan-400 font-mono text-xs opacity-30 animate-float"
             style={{
               left: `${Math.random() * 100}%`,
               animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${15 + Math.random() * 10}s`,
+              animationDuration: `${15 + Math.random() * 50}s`,
             }}
           >
             {Math.random() > 0.5 ? "1" : "0"}
@@ -264,7 +263,7 @@ export default function Register() {
                   </label>
                   <input
                     type="email"
-                    className="w-full px-4 py-3 bg-black border border-cyan-500/60 focus:scale-[1.02] hover:scale-[1.01] focus:outline-none focus:border-red-500 text-white font-mono transition-all duration-200 shadow-[0_0_15px_rgba(34,211,238,0.2)] focus:shadow-[0_0_20px_rgba(239,68,68,0.4)]"
+                    className="w-full px-4 py-4 bg-black border border-cyan-500/60 focus:scale-[1.02] hover:scale-[1.01] focus:outline-none focus:border-red-500 text-white font-mono transition-all duration-200 shadow-[0_0_15px_rgba(34,211,238,0.2)] focus:shadow-[0_0_20px_rgba(239,68,68,0.4)]"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -286,7 +285,7 @@ export default function Register() {
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}
-                      className="w-full px-4 py-3 bg-black border border-cyan-500/60 focus:scale-[1.02] hover:scale-[1.01] focus:outline-none focus:border-red-500 text-white font-mono transition-all duration-200 shadow-[0_0_15px_rgba(34,211,238,0.2)] focus:shadow-[0_0_20px_rgba(239,68,68,0.4)] pr-24"
+                      className="w-full px-4 py-4 bg-black border border-cyan-500/60 focus:scale-[1.02] hover:scale-[1.01] focus:outline-none focus:border-red-500 text-white font-mono transition-all duration-200 shadow-[0_0_15px_rgba(34,211,238,0.2)] focus:shadow-[0_0_20px_rgba(239,68,68,0.4)] pr-24"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
@@ -421,7 +420,7 @@ export default function Register() {
                   <div className="relative">
                     <input
                       type={showConfirmPassword ? "text" : "password"}
-                      className={`w-full px-4 py-3 bg-black border focus:scale-[1.02] hover:scale-[1.01] focus:outline-none focus:border-red-500 text-white font-mono transition-all duration-200 shadow-[0_0_15px_rgba(34,211,238,0.2)] focus:shadow-[0_0_20px_rgba(239,68,68,0.4)] pr-12 ${
+                      className={`w-full px-4 py-4 bg-black border focus:scale-[1.02] hover:scale-[1.01] focus:outline-none focus:border-red-500 text-white font-mono transition-all duration-200 shadow-[0_0_15px_rgba(34,211,238,0.2)] focus:shadow-[0_0_20px_rgba(239,68,68,0.4)] pr-12 ${
                         confirmPassword && password !== confirmPassword
                           ? "border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.4)]"
                           : "border-cyan-500/60"
@@ -450,29 +449,30 @@ export default function Register() {
                     </div>
                   )}
                 </div>
-
-                <button
-                  type="submit"
-                  disabled={loading || !isFormValid()}
-                  className={`w-full py-4 font-bold text-lg font-mono transition-all duration-200 border relative overflow-hidden group ${
-                    loading || !isFormValid()
-                      ? "bg-gray-900 border-gray-700 text-gray-500 cursor-not-allowed"
-                      : "bg-black border-cyan-400 focus:scale-[1.01] hover:bg-gradient-to-r hover:from-cyan-400/10 hover:to-pink-600/10 hover:border-pink-600 text-cyan-400 hover:text-pink-400 shadow-[0_0_20px_rgba(34,211,238,0.3)] hover:shadow-[0_0_25px_rgba(219,39,119,0.4)]"
-                  }`}
-                >
-                  <span className="relative z-10 flex items-center justify-center gap-2">
-                    {loading ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
-                        GENERATING_IDENTITY...
-                      </>
-                    ) : (
-                      "CREATE_IDENTITY"
-                    )}
-                  </span>
-                  {/* Button hover effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/0 via-pink-600/0 to-cyan-400/0 opacity-0 group-hover:opacity-100 group-hover:animate-shimmer transition-opacity duration-300"></div>
-                </button>
+                <div className="flex justify-center mt-8 ">
+                  <button
+                    type="submit"
+                    disabled={loading || !isFormValid()}
+                    className={`w-64 py-4 font-bold text-lg font-mono transition-all duration-200 border relative overflow-hidden group ${
+                      loading || !isFormValid()
+                        ? "bg-gray-900 border-gray-700 text-gray-500 cursor-not-allowed"
+                        : "bg-black border-cyan-400 focus:scale-[1.01] hover:bg-gradient-to-r hover:from-cyan-400/10 hover:to-pink-600/10 hover:border-pink-600 text-cyan-400 hover:text-pink-400 shadow-[0_0_20px_rgba(34,211,238,0.3)] hover:shadow-[0_0_25px_rgba(219,39,119,0.4)]"
+                    }`}
+                  >
+                    <span className="relative z-10 flex items-center justify-center gap-2">
+                      {loading ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+                          GENERATING_IDENTITY...
+                        </>
+                      ) : (
+                        "CREATE_IDENTITY"
+                      )}
+                    </span>
+                    {/* Button hover effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/0 via-pink-600/0 to-cyan-400/0 opacity-0 group-hover:opacity-100 group-hover:animate-shimmer transition-opacity duration-300"></div>
+                  </button>
+                </div>
               </form>
 
               <div className="text-center mt-6 pt-6 border-t border-cyan-400/20 relative z-10">
@@ -490,7 +490,7 @@ export default function Register() {
           </div>
 
           {/* Status indicators */}
-          <div className="mt-12 flex gap-8 text-cyan-400 font-mono text-xs">
+          <div className="mt-4 mb-15 flex gap-8 text-cyan-400 font-mono text-xs">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-green-500 shadow-[0_0_8px_rgba(34,211,238,0.6)] animate-pulse"></div>
               <span>SYSTEM_ONLINE</span>
@@ -501,7 +501,7 @@ export default function Register() {
             </div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-pink-600 shadow-[0_0_8px_rgba(219,39,119,0.6)] animate-pulse"></div>
-              <span>VAULT_v0.1</span>
+              <span>VAULT_v1.1</span>
             </div>
           </div>
         </div>
@@ -522,6 +522,14 @@ export default function Register() {
           <p className="text-cyan-300 font-mono text-xs">
             MASTER_PASSWORD_ENCRYPTS_LOCALLY • SERVER_NEVER_SEES_RAW_DATA
           </p>
+          <a
+            href="https://github.com/NeoLynX-here/vaultify.git"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-pink-500 hover:text-cyan-400 font-mono text-xs transition-all duration-200 hover:tracking-wider group-hover:shadow-[0_0_10px_rgba(34,211,238,0.3)] px-2 py-1"
+          >
+            [ACCESS_SOURCE_CODE]
+          </a>
         </div>
       </div>
     </div>
