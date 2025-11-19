@@ -1,4 +1,4 @@
----
+
 
 # 🔐 VAULTIFY
 
@@ -111,7 +111,7 @@ CREATE DATABASE vaultify;
 2. Run the schema file:
 
 ```sh
-psql -U postgres -d vaultify -f schema.sql
+psql -U postgres -d vaultify -f vault.sql
 ```
 
 Your final schema includes:
