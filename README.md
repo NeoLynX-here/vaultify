@@ -41,10 +41,10 @@ graph TB
     D --> F[(PostgreSQL<br/>Users/Vaults)]
     E --> F
     
-    style B fill:#ff6b6b
-    style C fill:#4ecdc4
-    style D fill:#45b7d1
-    style E fill:#96ceb4
+    style B fill:#270062
+    style C fill:#270062
+    style D fill:#270062
+    style E fill:#270062
 ```
 
 ---
@@ -71,7 +71,6 @@ graph TB
 | **Premium Control** | ✅ | Grant/revoke premium access |
 | **2FA Reset** | ✅ | Emergency 2FA disable for users |
 | **Premium Key Generation** | ✅ | Create new activation keys |
-| **System Analytics** | ✅ | User statistics and system health |
 | **Admin Authentication** | ✅ | Secure admin login system |
 
 ### ⚙️ **Backend Services**
