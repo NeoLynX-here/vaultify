@@ -1,3 +1,5 @@
+import crypto from 'crypto';
+
 export const generateRandomPassword = (options = {}) => {
   const {
     length = 16,
@@ -46,18 +48,25 @@ export const generateRandomPassword = (options = {}) => {
   // Step 1: Ensure at least one character from each selected type
   requiredChars.forEach((charSet) => {
     if (charSet.length > 0) {
-      password += charSet[Math.floor(Math.random() * charSet.length)];
+      password += charSet[crypto.randomInt(charSet.length)];
     }
   });
 
   // Step 2: Fill the rest with random characters from all sets
   for (let i = password.length; i < length; i++) {
-    password += allChars[Math.floor(Math.random() * allChars.length)];
+    password += allChars[crypto.randomInt(allChars.length)];
   }
 
   // Step 3: Shuffle the password to mix the required characters
-  return password
-    .split("")
-    .sort(() => Math.random() - 0.5)
-    .join("");
+  return secureShuffle(password.split("")).join("");
 };
+
+
+// Fisher-Yates shuffle using cryptographically secure random
+function secureShuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = crypto.randomInt(i + 1);
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
