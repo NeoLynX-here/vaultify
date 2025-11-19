@@ -84,7 +84,7 @@ GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO vaultuser;
 -- ------------------------------------------------------------
 COMMIT;
 
--- 💡 Useful commands:
+--  Useful commands:
 -- \du             - list roles
 -- \c vaultify     - connect to DB
 -- \dt             - list tables
