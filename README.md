@@ -125,7 +125,7 @@ DB_NAME=vaultify
 
 JWT_SECRET=supersecretjwt
 ADMIN_USER=admin
-ADMIN_PASS=admin123
+ADMIN_PASS=Admin@123
 ```
 
 ---
@@ -136,14 +136,14 @@ ADMIN_PASS=admin123
 
 ```sh
 cd backend
-node main.js
+npm run dev
 ```
 
 ### Start backend-admin:
 
 ```sh
 cd backend-admin
-node main.js
+npm run dev
 ```
 
 ### Start user Vaultify app:
