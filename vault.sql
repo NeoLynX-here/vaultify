@@ -1,5 +1,5 @@
 -- ============================================================
--- 🔥 VAULTIFY — FULL UPDATED DATABASE SCHEMA
+--  VAULTIFY — FULL UPDATED DATABASE SCHEMA
 -- PostgreSQL setup including premium, cards, and 2FA support
 -- ============================================================
 
@@ -8,7 +8,7 @@ DROP DATABASE IF EXISTS vaultify;
 DROP ROLE IF EXISTS vaultuser;
 
 -- ------------------------------------------------------------
--- 1️⃣ Create vault user / role
+-- 1️ Create vault user / role
 -- ------------------------------------------------------------
 CREATE ROLE vaultuser WITH
     LOGIN
@@ -16,7 +16,7 @@ CREATE ROLE vaultuser WITH
     CREATEDB;
 
 -- ------------------------------------------------------------
--- 2️⃣ Create database
+-- 2️ Create database
 -- ------------------------------------------------------------
 CREATE DATABASE vaultify
     OWNER vaultuser
@@ -26,12 +26,12 @@ CREATE DATABASE vaultify
     TEMPLATE template0;
 
 -- ------------------------------------------------------------
--- 3️⃣ Connect to DB
+-- 3️ Connect to DB
 -- ------------------------------------------------------------
 \connect vaultify;
 
 -- ------------------------------------------------------------
--- 4️⃣ USERS TABLE (Updated to your new schema)
+-- 4️ USERS TABLE (Updated to your new schema)
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE UNIQUE INDEX IF NOT EXISTS users_email_key ON users (email);
 
 -- ------------------------------------------------------------
--- 5️⃣ TWOFA TICKETS TABLE
+-- 5️ TWOFA TICKETS TABLE
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS twofa_tickets (
     id SERIAL PRIMARY KEY,
@@ -71,7 +71,7 @@ CREATE INDEX IF NOT EXISTS idx_twofa_tickets_ticket ON twofa_tickets(ticket);
 CREATE INDEX IF NOT EXISTS idx_twofa_tickets_expires ON twofa_tickets(expires_at);
 
 -- ------------------------------------------------------------
--- 6️⃣ Set ownership and permissions
+-- 6️ Set ownership and permissions
 -- ------------------------------------------------------------
 ALTER TABLE users OWNER TO vaultuser;
 ALTER TABLE twofa_tickets OWNER TO vaultuser;
@@ -80,7 +80,7 @@ GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO vaultuser;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO vaultuser;
 
 -- ------------------------------------------------------------
--- 7️⃣ Done
+-- 7️ Done
 -- ------------------------------------------------------------
 COMMIT;
 
