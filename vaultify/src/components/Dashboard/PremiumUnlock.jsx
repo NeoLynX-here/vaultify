@@ -16,7 +16,7 @@ export default function PremiumUnlockModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/20 backdrop-blur-md flex items-center justify-center z-50 p-4">
       <div className="bg-gray-900 border border-cyan-400 p-6 max-w-md w-full relative">
         {/* Close Button */}
         <button
