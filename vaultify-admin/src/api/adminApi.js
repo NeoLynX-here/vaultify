@@ -1,4 +1,4 @@
-// api/api.js
+// api/adminApi.js
 const ADMIN_BASE = "http://localhost:5001/api/admin";
 
 // Generic fetch wrapper with error handling
@@ -39,7 +39,7 @@ async function fetchWithAuth(url, options = {}, token = null) {
 
   if (!response.ok) {
     const error = new Error(
-      data?.message || `HTTP error! status: ${response.status}`
+      data?.message || data?.error || `HTTP error! status: ${response.status}`
     );
     error.status = response.status;
     error.data = data;
@@ -108,7 +108,48 @@ export async function regeneratePremiumKey(userId, token) {
 }
 
 // -------------------------
-// BATCH OPERATIONS (Optional - for future use)
+// DELETE USER
+// -------------------------
+export async function deleteUser(userId, token) {
+  return fetchWithAuth(
+    `/users/${userId}`,
+    {
+      method: "DELETE",
+    },
+    token
+  );
+}
+
+// -------------------------
+// BULK DELETE USERS
+// -------------------------
+export async function bulkDeleteUsers(userIds, token) {
+  return fetchWithAuth(
+    "/users/bulk",
+    {
+      method: "DELETE",
+      body: JSON.stringify({ userIds }),
+    },
+    token
+  );
+}
+
+// -------------------------
+// DELETE ALL USERS (DANGEROUS)
+// -------------------------
+export async function deleteAllUsers(token) {
+  return fetchWithAuth(
+    "/users",
+    {
+      method: "DELETE",
+      body: JSON.stringify({ confirm: "DELETE_ALL_USERS" }),
+    },
+    token
+  );
+}
+
+// -------------------------
+// BATCH OPERATIONS
 // -------------------------
 export async function batchTogglePremium(userIds, isPremium, token) {
   return fetchWithAuth(

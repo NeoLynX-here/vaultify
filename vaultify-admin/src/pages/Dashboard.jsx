@@ -7,6 +7,9 @@ import {
   togglePremium,
   reset2FA,
   regeneratePremiumKey,
+  deleteUser,
+  bulkDeleteUsers,
+  deleteAllUsers,
 } from "../api/adminApi";
 
 export default function Dashboard() {
@@ -115,6 +118,42 @@ export default function Dashboard() {
     [token, loadUsers, handleApiError]
   );
 
+  // Delete single user
+  const handleDeleteUser = useCallback(
+    async (userId) => {
+      try {
+        await deleteUser(userId, token);
+        await loadUsers();
+      } catch (err) {
+        handleApiError(err, "delete user");
+      }
+    },
+    [token, loadUsers, handleApiError]
+  );
+
+  // Bulk delete users
+  const handleBulkDelete = useCallback(
+    async (userIds) => {
+      try {
+        await bulkDeleteUsers(userIds, token);
+        await loadUsers();
+      } catch (err) {
+        handleApiError(err, "delete users");
+      }
+    },
+    [token, loadUsers, handleApiError]
+  );
+
+  // Delete all users
+  const handleDeleteAll = useCallback(async () => {
+    try {
+      await deleteAllUsers(token);
+      await loadUsers();
+    } catch (err) {
+      handleApiError(err, "delete all users");
+    }
+  }, [token, loadUsers, handleApiError]);
+
   // Logout function
   const logout = useCallback(() => {
     sessionStorage.removeItem("adminToken");
@@ -131,44 +170,103 @@ export default function Dashboard() {
   }, [token, nav, loadUsers]);
 
   return (
-    <div className="h-screen bg-black text-white p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-cyan-400">Admin Dashboard</h1>
+    <div className="min-h-screen bg-gray-900 text-white p-6">
+      {/* Header with cyberpunk styling */}
+      <div className="flex justify-between items-center mb-8 p-4 bg-black/80 border border-cyan-400/50 rounded-lg shadow-[0_0_20px_rgba(34,211,238,0.3)]">
+        <div>
+          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-pink-600 font-mono">
+            ADMIN_DASHBOARD
+          </h1>
+          <p className="text-cyan-300 text-sm font-mono mt-1">
+            USER_MANAGEMENT_SYSTEM
+          </p>
+        </div>
         <div className="flex gap-3">
           <button
             onClick={logout}
-            className="px-4 py-2 bg-red-600 rounded hover:bg-red-700 transition-colors"
+            className="px-6 py-3 bg-red-600 hover:bg-red-700 rounded border border-red-400 font-mono text-sm transition-all duration-200 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)]"
           >
-            Logout
+            LOGOUT
           </button>
           <button
             onClick={loadUsers}
             disabled={loading}
-            className="px-4 py-2 bg-cyan-600 rounded hover:bg-cyan-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-3 bg-cyan-600 hover:bg-cyan-700 rounded border border-cyan-400 font-mono text-sm transition-all duration-200 hover:shadow-[0_0_15px_rgba(34,211,238,0.5)] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? "Refreshing..." : "Refresh"}
+            {loading ? "REFRESHING..." : "REFRESH"}
           </button>
         </div>
       </div>
 
+      {/* Stats Overview */}
+      {users.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-black/60 border border-cyan-400/30 rounded p-4 text-center">
+            <div className="text-2xl font-bold text-cyan-400">
+              {users.length}
+            </div>
+            <div className="text-cyan-300 text-sm font-mono">TOTAL_USERS</div>
+          </div>
+          <div className="bg-black/60 border border-green-400/30 rounded p-4 text-center">
+            <div className="text-2xl font-bold text-green-400">
+              {users.filter((u) => u.is_premium).length}
+            </div>
+            <div className="text-green-300 text-sm font-mono">
+              PREMIUM_USERS
+            </div>
+          </div>
+          <div className="bg-black/60 border border-yellow-400/30 rounded p-4 text-center">
+            <div className="text-2xl font-bold text-yellow-400">
+              {users.filter((u) => u.twofa_enabled).length}
+            </div>
+            <div className="text-yellow-300 text-sm font-mono">2FA_ENABLED</div>
+          </div>
+          <div className="bg-black/60 border border-purple-400/30 rounded p-4 text-center">
+            <div className="text-2xl font-bold text-purple-400">
+              {users.filter((u) => u.premium_key).length}
+            </div>
+            <div className="text-purple-300 text-sm font-mono">ACTIVE_KEYS</div>
+          </div>
+        </div>
+      )}
+
       {error && (
-        <div className="mb-4 p-3 bg-red-900/50 border border-red-500 rounded text-red-200">
-          {error}
+        <div className="mb-6 p-4 bg-red-900/50 border border-red-500 rounded text-red-200 font-mono">
+          ⚠️ {error}
         </div>
       )}
 
       {loading ? (
-        <div className="flex justify-center items-center py-8">
-          <div className="text-cyan-400 text-lg">Loading users...</div>
+        <div className="flex justify-center items-center py-12">
+          <div className="text-cyan-400 text-lg font-mono animate-pulse">
+            LOADING_USER_DATA...
+          </div>
         </div>
       ) : (
-        <UserTable
-          users={users}
-          onTogglePremium={handleTogglePremium}
-          onReset2FA={handleReset2FA}
-          onRegenerateKey={handleRegenerateKey}
-        />
+        <div className="bg-black/40 border border-cyan-400/30 rounded-lg p-4 shadow-[0_0_30px_rgba(34,211,238,0.2)]">
+          <UserTable
+            users={users}
+            onTogglePremium={handleTogglePremium}
+            onReset2FA={handleReset2FA}
+            onRegenerateKey={handleRegenerateKey}
+            onDeleteUser={handleDeleteUser}
+            onBulkDelete={handleBulkDelete}
+            onDeleteAll={handleDeleteAll}
+          />
+        </div>
       )}
+
+      {/* Footer */}
+      <div className="mt-8 text-center text-cyan-400/60 text-sm font-mono">
+        <div className="flex justify-center gap-6 mb-2">
+          <span>SYSTEM_SECURE</span>
+          <span>•</span>
+          <span>ENCRYPTED_COMMS</span>
+          <span>•</span>
+          <span>ADMIN_PRIVILEGES</span>
+        </div>
+        <div>VAULTIFY_ADMIN_PANEL v1.0</div>
+      </div>
     </div>
   );
 }
