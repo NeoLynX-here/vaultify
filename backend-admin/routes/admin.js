@@ -145,4 +145,144 @@ router.patch("/users/:id/2fa-reset", verifyAdmin, async (req, res) => {
   }
 });
 
+/* -----------------------------
+   9. Delete User (with all data) - UPDATED FOR YOUR SCHEMA
+------------------------------ */
+router.delete("/users/:id", verifyAdmin, async (req, res) => {
+  const { id } = req.params;
+  console.log(`🗑️ DELETE request for user ID: ${id}`);
+
+  try {
+    const client = await pool.connect();
+    
+    try {
+      await client.query('BEGIN');
+
+      // Check if user exists first
+      const userCheck = await client.query('SELECT id FROM users WHERE id = $1', [id]);
+      if (userCheck.rows.length === 0) {
+        await client.query('ROLLBACK');
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      console.log(`✅ User ${id} exists, deleting related data...`);
+
+      // Delete user's 2FA tickets (this table exists in your schema)
+      const twofaResult = await client.query('DELETE FROM twofa_tickets WHERE user_id = $1', [id]);
+      console.log(`✅ Deleted ${twofaResult.rowCount} 2FA tickets for user ${id}`);
+
+      // Note: Your schema doesn't have separate vault_items or cards tables
+      // The data is stored as JSONB blobs in the users table itself
+      // So we just need to delete the user and PostgreSQL CASCADE will handle twofa_tickets
+
+      // Finally delete the user - CASCADE will handle twofa_tickets due to foreign key
+      const result = await client.query('DELETE FROM users WHERE id = $1', [id]);
+      
+      await client.query('COMMIT');
+
+      console.log(`✅ Successfully deleted user ${id} and all related data`);
+
+      res.json({ 
+        success: true, 
+        message: "User and all associated data deleted successfully",
+        deletedUser: result.rowCount
+      });
+    } catch (err) {
+      await client.query('ROLLBACK');
+      console.error('❌ Transaction error:', err);
+      
+      // Provide more specific error messages
+      if (err.message.includes("foreign key constraint")) {
+        res.status(500).json({ 
+          error: "Database constraint error - cannot delete user due to related data",
+          details: "Check if all foreign key relationships are properly set up"
+        });
+      } else {
+        res.status(500).json({ 
+          error: "Failed to delete user",
+          details: err.message 
+        });
+      }
+    } finally {
+      client.release();
+    }
+  } catch (err) {
+    console.error("❌ Delete user error:", err);
+    res.status(500).json({ 
+      error: "Failed to delete user",
+      details: err.message 
+    });
+  }
+});
+
+/* -----------------------------
+   9. Delete User (with all data) - UPDATED FOR YOUR SCHEMA
+------------------------------ */
+router.delete("/users/:id", verifyAdmin, async (req, res) => {
+  const { id } = req.params;
+  console.log(`🗑️ DELETE request for user ID: ${id}`);
+
+  try {
+    const client = await pool.connect();
+    
+    try {
+      await client.query('BEGIN');
+
+      // Check if user exists first
+      const userCheck = await client.query('SELECT id FROM users WHERE id = $1', [id]);
+      if (userCheck.rows.length === 0) {
+        await client.query('ROLLBACK');
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      console.log(`✅ User ${id} exists, deleting related data...`);
+
+      // Delete user's 2FA tickets (this table exists in your schema)
+      const twofaResult = await client.query('DELETE FROM twofa_tickets WHERE user_id = $1', [id]);
+      console.log(`✅ Deleted ${twofaResult.rowCount} 2FA tickets for user ${id}`);
+
+      // Note: Your schema doesn't have separate vault_items or cards tables
+      // The data is stored as JSONB blobs in the users table itself
+      // So we just need to delete the user and PostgreSQL CASCADE will handle twofa_tickets
+
+      // Finally delete the user - CASCADE will handle twofa_tickets due to foreign key
+      const result = await client.query('DELETE FROM users WHERE id = $1', [id]);
+      
+      await client.query('COMMIT');
+
+      console.log(`✅ Successfully deleted user ${id} and all related data`);
+
+      res.json({ 
+        success: true, 
+        message: "User and all associated data deleted successfully",
+        deletedUser: result.rowCount
+      });
+    } catch (err) {
+      await client.query('ROLLBACK');
+      console.error('❌ Transaction error:', err);
+      
+      // Provide more specific error messages
+      if (err.message.includes("foreign key constraint")) {
+        res.status(500).json({ 
+          error: "Database constraint error - cannot delete user due to related data",
+          details: "Check if all foreign key relationships are properly set up"
+        });
+      } else {
+        res.status(500).json({ 
+          error: "Failed to delete user",
+          details: err.message 
+        });
+      }
+    } finally {
+      client.release();
+    }
+  } catch (err) {
+    console.error("❌ Delete user error:", err);
+    res.status(500).json({ 
+      error: "Failed to delete user",
+      details: err.message 
+    });
+  }
+});
+
 export default router;
