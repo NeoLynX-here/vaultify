@@ -283,6 +283,7 @@ export default function DashboardUI(props) {
           onVerify={props.handleVerify2FA}
           onClose={props.close2FASetup}
           loading={props.twofaLoading}
+          twofaError={props.twofaError}
         />
       );
     }
