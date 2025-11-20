@@ -159,7 +159,17 @@ PasswordField.displayName = "PasswordField";
 
 // Memoized Action Button Component
 const ActionButton = memo(
-  ({ type, onClick, disabled, isValid, label, mobileLabel, icon }) => {
+  ({
+    type,
+    onClick,
+    disabled,
+    isValid,
+    label,
+    mobileLabel,
+    icon,
+    mobileOnly = false,
+    desktopOnly = false,
+  }) => {
     const isPrimary = type === "primary";
 
     const baseClasses =
@@ -172,13 +182,19 @@ const ActionButton = memo(
     const secondaryClasses =
       "bg-black border border-pink-600 text-pink-400 hover:bg-pink-600 hover:text-black";
 
+    const visibilityClasses = mobileOnly
+      ? "flex md:hidden"
+      : desktopOnly
+      ? "hidden md:flex"
+      : "flex";
+
     return (
       <button
         onClick={onClick}
         disabled={disabled}
         className={`${baseClasses} ${
           isPrimary ? primaryClasses : secondaryClasses
-        }`}
+        } ${visibilityClasses}`}
         title={
           isPrimary
             ? isValid
@@ -301,7 +317,7 @@ export default function AddItems({
 
   return (
     <div
-      className="fixed inset-0 bg-black/30 backdrop-blur-md flex justify-center items-center z-50 animate-fadeIn p-2 md:p-0"
+      className="fixed inset-0 backdrop-blur-md flex justify-center items-center z-50 animate-fadeIn p-2 md:p-0"
       role="dialog"
       aria-modal="true"
     >
@@ -328,7 +344,7 @@ export default function AddItems({
 
       {/* Main Add Form */}
       <div
-        className={`relative bg-black/70 border border-cyan-400/50 p-4 md:p-8 shadow-[0_0_40px_rgba(34,211,238,0.4)] w-full max-w-lg mx-2 md:mx-4 max-h-[90vh] overflow-y-auto group backdrop-blur-sm ${
+        className={`relative bg-cyan/20 border border-cyan-400/50 p-4 md:p-8 shadow-[0_0_40px_rgba(34,211,238,0.4)] w-[80vw] max-w-md md:max-w-lg mx-auto group backdrop-blur-sm ${
           showPasswordGenerator ? "opacity-20 pointer-events-none" : ""
         }`}
       >
@@ -341,12 +357,10 @@ export default function AddItems({
         {/* Desktop Close Button - Top Right */}
         <button
           onClick={onCancel}
-          className="hidden md:flex absolute top-4 right-4 text-cyan-400 hover:text-pink-400 transition-colors duration-200 p-2 bg-black/80 border border-cyan-400/50 hover:border-pink-400/50 rounded-none group"
+          className="hidden md:flex absolute -top-4 -right-4 bg-black border border-cyan-400 text-red-400 w-8 h-8 items-center justify-center hover:bg-red-600 hover:text-white transition-colors z-10"
           title="Close modal"
         >
-          <span className="material-icons text-xl group-hover:scale-110 transition-transform">
-            close
-          </span>
+          <span className="material-icons text-lg">close</span>
         </button>
 
         {/* Header */}
@@ -391,7 +405,7 @@ export default function AddItems({
             />
           </div>
 
-          {/* Buttons - Remove abort button on desktop */}
+          {/* Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 md:gap-4 pt-3 md:pt-4">
             <ActionButton
               type="primary"
@@ -410,7 +424,7 @@ export default function AddItems({
               label="ABORT"
               mobileLabel="CANCEL"
               icon="close"
-              mobileOnly
+              mobileOnly={true}
             />
           </div>
 

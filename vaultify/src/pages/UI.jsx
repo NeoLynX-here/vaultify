@@ -5,7 +5,6 @@ import SearchBar from "../components/Dashboard/SearchBar.jsx";
 import VaultItemsList from "../components/Dashboard/VaultItemsList.jsx";
 import CardsList from "../components/Dashboard/CardsList.jsx";
 import Sidebar from "../components/Dashboard/Sidebar.jsx";
-import TwoFASetupModal from "../components/Dashboard/TwoFASetup.jsx";
 import EditCardModal from "../components/Dashboard/EditCard.jsx";
 
 // Memoized binary particles with better visibility
@@ -275,19 +274,6 @@ export default function DashboardUI(props) {
       );
     }
 
-    if (props.show2FASetup) {
-      modalComponents.push(
-        <TwoFASetupModal
-          key="2fa-setup"
-          qrCode={props.qrCode}
-          onVerify={props.handleVerify2FA}
-          onClose={props.close2FASetup}
-          loading={props.twofaLoading}
-          twofaError={props.twofaError}
-        />
-      );
-    }
-
     return modalComponents;
   }, [
     props.showAddForm,
@@ -305,48 +291,72 @@ export default function DashboardUI(props) {
     props.cancelCardEdit,
     props.cards.items,
     props.cardLogic,
-    props.show2FASetup,
     props.qrCode,
-    props.handleVerify2FA,
-    props.close2FASetup,
-    props.twofaLoading,
   ]);
 
   // Memoized sidebar props to prevent unnecessary re-renders
-  const sidebarProps = useMemo(() => ({
-    activeTab: props.activeTab,
-    setActiveTab: props.setActiveTab,
-    onScan: props.scanForBreaches,
-    scanning: props.scanning,
-    breachResults: props.breachResults,
-    onClear: props.clearBreachResults,
-    vault: props.vault,
-    cards: props.cards,
-    isPremium: props.isPremium,
-    onUnlockPremium: props.onUnlockPremium,
-    premiumLoading: props.premiumLoading,
-    twofaEnabled: props.twofaEnabled,
-    onEnable2FA: props.onEnable2FA,
-    onDisable2FA: props.onDisable2FA,
-    twofaLoading: props.twofaLoading,
-    showPremiumModal: props.showPremiumModal,
-    setShowPremiumModal: props.setShowPremiumModal,
-    premiumError: props.premiumError,
-    onDisablePremium: props.onDisablePremium,
-    showDisablePremiumModal: props.showDisablePremiumModal,
-    setShowDisablePremiumModal: props.setShowDisablePremiumModal,
-    twofaError: props.twofaError,
-    showDisable2FAModal: props.showDisable2FAModal,
-    closeDisable2FAModal: props.closeDisable2FAModal,
-  }), [
-    props.activeTab, props.setActiveTab, props.scanForBreaches, props.scanning,
-    props.breachResults, props.clearBreachResults, props.vault, props.cards,
-    props.isPremium, props.onUnlockPremium, props.premiumLoading, props.twofaEnabled,
-    props.onEnable2FA, props.onDisable2FA, props.twofaLoading, props.showPremiumModal,
-    props.setShowPremiumModal, props.premiumError, props.onDisablePremium,
-    props.showDisablePremiumModal, props.setShowDisablePremiumModal, props.twofaError,
-    props.showDisable2FAModal, props.closeDisable2FAModal,
-  ]);
+  const sidebarProps = useMemo(
+    () => ({
+      activeTab: props.activeTab,
+      setActiveTab: props.setActiveTab,
+      onScan: props.scanForBreaches,
+      scanning: props.scanning,
+      breachResults: props.breachResults,
+      onClear: props.clearBreachResults,
+      vault: props.vault,
+      cards: props.cards,
+      isPremium: props.isPremium,
+      onUnlockPremium: props.onUnlockPremium,
+      premiumLoading: props.premiumLoading,
+      twofaEnabled: props.twofaEnabled,
+      onEnable2FA: props.onEnable2FA,
+      onDisable2FA: props.onDisable2FA,
+      twofaLoading: props.twofaLoading,
+      showPremiumModal: props.showPremiumModal,
+      setShowPremiumModal: props.setShowPremiumModal,
+      premiumError: props.premiumError,
+      onDisablePremium: props.onDisablePremium,
+      showDisablePremiumModal: props.showDisablePremiumModal,
+      setShowDisablePremiumModal: props.setShowDisablePremiumModal,
+      twofaError: props.twofaError,
+      showDisable2FAModal: props.showDisable2FAModal,
+      closeDisable2FAModal: props.closeDisable2FAModal,
+      show2FASetup: props.show2FASetup,
+      qrCode: props.qrCode,
+      handleVerify2FA: props.handleVerify2FA,
+      close2FASetup: props.close2FASetup,
+    }),
+    [
+      props.activeTab,
+      props.setActiveTab,
+      props.scanForBreaches,
+      props.scanning,
+      props.breachResults,
+      props.clearBreachResults,
+      props.vault,
+      props.cards,
+      props.isPremium,
+      props.onUnlockPremium,
+      props.premiumLoading,
+      props.twofaEnabled,
+      props.onEnable2FA,
+      props.onDisable2FA,
+      props.twofaLoading,
+      props.showPremiumModal,
+      props.setShowPremiumModal,
+      props.premiumError,
+      props.onDisablePremium,
+      props.showDisablePremiumModal,
+      props.setShowDisablePremiumModal,
+      props.twofaError,
+      props.showDisable2FAModal,
+      props.closeDisable2FAModal,
+      props.show2FASetup,
+      props.qrCode,
+      props.handleVerify2FA,
+      props.close2FASetup,
+    ]
+  );
 
   // Memoized status indicator props
   const statusIndicatorProps = useMemo(() => ({

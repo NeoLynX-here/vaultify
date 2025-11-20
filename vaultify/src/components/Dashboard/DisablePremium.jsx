@@ -18,12 +18,12 @@ export default function DisablePremiumModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 backdrop-blur-md flex items-center justify-center z-55 p-4">
       <div className="bg-gray-900 border border-red-400 p-6 max-w-md w-full relative">
-        {/* Close Button */}
+        {/* Desktop Close Button */}
         <button
           onClick={onClose}
-          className="absolute -top-3 -right-3 bg-black border border-red-400 text-red-400 w-8 h-8 flex items-center justify-center hover:bg-red-400 hover:text-black transition-colors"
+          className="hidden md:flex absolute -top-3 -right-3 bg-black border border-red-400 text-red-400 w-8 h-8 items-center justify-center hover:bg-red-400 hover:text-black transition-colors"
           title="Close"
           disabled={loading}
         >
@@ -37,27 +37,39 @@ export default function DisablePremiumModal({
         <div className="space-y-4">
           {/* Warning */}
           <div className="text-center">
-            <p className="text-white mb-3 font-mono text-sm">
-              ⚠️ This action will remove all premium features
+            <p className="text-white mb-3 font-mono text-sm flex items-center justify-center gap-2">
+              <span className="material-icons text-red-400">warning</span>
+              This action will remove all premium features
             </p>
-            <div className="bg-black border border-red-400/30 p-3 text-red-300 text-xs font-mono">
-              <p>❌ Breach scanning disabled</p>
-              <p>❌ Advanced features locked</p>
-              <p>❌ Priority support removed</p>
+            <div className="bg-black border border-red-400/30 p-3 text-red-300 text-xs font-mono space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="material-icons text-sm">block</span>
+                <span>Breach scanning disabled</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="material-icons text-sm">lock</span>
+                <span>Advanced features locked</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="material-icons text-sm">support</span>
+                <span>Priority support removed</span>
+              </div>
             </div>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="bg-red-900/50 border border-red-500 text-red-200 p-3 text-sm font-mono">
-              ⚠️ {error}
+            <div className="bg-red-900/50 border border-red-500 text-red-200 p-3 text-sm font-mono flex items-center gap-2">
+              <span className="material-icons">error</span>
+              {error}
             </div>
           )}
 
           {/* Password Input Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-red-400 text-sm mb-2 font-mono">
+              <label className="block text-red-400 text-sm mb-2 font-mono flex items-center gap-2">
+                <span className="material-icons">vpn_key</span>
                 ENTER PASSWORD TO CONFIRM:
               </label>
               <div className="relative">
@@ -87,29 +99,46 @@ export default function DisablePremiumModal({
               <button
                 type="submit"
                 disabled={loading || !password.trim()}
-                className="flex-1 bg-red-600 text-white p-3 font-mono hover:bg-red-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed border border-red-600 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)]"
+                className="flex-1 bg-red-600 text-white p-3 font-mono hover:bg-red-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed border border-red-600 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)] flex items-center justify-center gap-2"
               >
-                {loading ? "VERIFYING..." : "DISABLE PREMIUM"}
+                {loading ? (
+                  <>
+                    <span className="material-icons animate-spin">refresh</span>
+                    VERIFYING...
+                  </>
+                ) : (
+                  <>
+                    <span className="material-icons">block</span>
+                    DISABLE PREMIUM
+                  </>
+                )}
               </button>
+              {/* Mobile Cancel Button */}
               <button
                 type="button"
                 onClick={onClose}
                 disabled={loading}
-                className="flex-1 bg-gray-800 text-white p-3 font-mono border border-gray-600 hover:bg-gray-700 transition-all duration-200 disabled:opacity-50"
+                className="flex-1 bg-gray-800 text-white p-3 font-mono border border-gray-600 hover:bg-gray-700 transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2 md:hidden"
               >
-                CANCEL
+                <span className="material-icons">close</span>
+                ABORT
               </button>
             </div>
           </form>
 
           {/* Help Text */}
-          <div className="text-xs text-gray-400 font-mono border-t border-gray-600 pt-3">
-            <p className="text-red-300">
-              🔒 This action requires password verification for security.
-            </p>
-            <p className="mt-1">
-              You can re-enable premium anytime with your premium key.
-            </p>
+          <div className="text-xs text-gray-400 font-mono border-t border-gray-600 pt-3 flex items-start gap-2">
+            <span className="material-icons text-red-400 text-sm">
+              security
+            </span>
+            <div>
+              <p className="text-red-300">
+                This action requires password verification for security.
+              </p>
+              <p className="mt-1">
+                You can re-enable premium anytime with your premium key.
+              </p>
+            </div>
           </div>
         </div>
       </div>

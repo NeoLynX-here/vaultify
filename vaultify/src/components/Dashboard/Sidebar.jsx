@@ -10,6 +10,7 @@ import PasswordGenerator from "./PasswordGenerator.jsx";
 import PremiumUnlockModal from "./PremiumUnlock.jsx";
 import DisablePremiumModal from "./DisablePremium.jsx";
 import Disable2FAModal from "./Disable2FA.jsx";
+import TwoFASetupModal from "./TwoFASetup.jsx";
 
 // Memoized Statistics Component
 const StatisticsDisplay = memo(({ stats, activeTab }) => (
@@ -176,6 +177,11 @@ export default function Sidebar({
   premiumError,
   showDisable2FAModal,
   closeDisable2FAModal,
+  show2FASetup,
+  qrCode,
+  handleVerify2FA,
+  close2FASetup,
+  secretKey,
 }) {
   const [showGenerator, setShowGenerator] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState("");
@@ -427,6 +433,16 @@ export default function Sidebar({
           onClose={closeDisable2FAModal}
           loading={twofaLoading}
           error={twofaError}
+        />
+      )}
+
+      {show2FASetup && (
+        <TwoFASetupModal
+          qrCode={qrCode}
+          onVerify={handleVerify2FA}
+          onClose={close2FASetup}
+          loading={twofaLoading}
+          twofaError={twofaError}
         />
       )}
     </>
