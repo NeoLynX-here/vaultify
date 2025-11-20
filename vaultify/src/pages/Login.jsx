@@ -29,9 +29,12 @@ export default function Login() {
     setLoading(true);
 
     try {
+      // normalize email
+      const normalizedEmail = email.toLowerCase().trim();
+
       // STEP 1: Get user's salt from server
       const saltRes = await fetch(
-        `${API_BASE}/getSalt?email=${encodeURIComponent(email)}`
+        `${API_BASE}/getSalt?email=${encodeURIComponent(normalizedEmail)}`
       );
       if (!saltRes.ok) throw new Error("Email not found or server error");
       const { salt } = await saltRes.json();
@@ -43,7 +46,7 @@ export default function Login() {
       const loginRes = await fetch(`${API_BASE}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, auth_proof: authProof }),
+        body: JSON.stringify({ email: normalizedEmail, auth_proof: authProof }),
       });
 
       if (!loginRes.ok) {
