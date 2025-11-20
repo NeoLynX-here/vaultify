@@ -113,7 +113,7 @@ npm install
 
 ```sql
 -- Run schema setup
-psql -U postgres -d vaultify -f vault.sql
+psql -U postgres -f vault.sql
 ```
 
 ### 3️⃣ Environment Configuration
