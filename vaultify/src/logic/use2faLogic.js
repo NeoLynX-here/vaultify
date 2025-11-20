@@ -1,12 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { API_BASE } from "../util/api";
 
-// Constants
 const ERROR_DISPLAY_TIME = 3000;
-const EXTENDED_ERROR_DISPLAY_TIME = 4000;
 
-export function use2FA(token, setError) {
-  // State
+export function use2FA(token, setUIMessage) {
   const [twofaEnabled, setTwofaEnabled] = useState(false);
   const [twofaLoading, setTwofaLoading] = useState(false);
   const [qrCode, setQrCode] = useState(null);
@@ -14,47 +11,51 @@ export function use2FA(token, setError) {
   const [showDisable2FAModal, setShowDisable2FAModal] = useState(false);
   const [twofaError, setTwofaError] = useState("");
 
-  // Refs for cleanup
-  const errorTimeoutRef = useRef(null);
-  const twofaErrorTimeoutRef = useRef(null);
+  // Two separate timers so UI success does NOT conflict with modal error
+  const modalErrorTimer = useRef(null);
+  const uiSuccessTimer = useRef(null);
 
-  // Cleanup timeouts on unmount
+  /** ---------------------
+   *  Clean up timers
+   * ----------------------*/
   useEffect(() => {
     return () => {
-      if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
-      if (twofaErrorTimeoutRef.current)
-        clearTimeout(twofaErrorTimeoutRef.current);
+      clearTimeout(modalErrorTimer.current);
+      clearTimeout(uiSuccessTimer.current);
     };
   }, []);
 
-  // Error management
-  const clearErrors = useCallback(() => {
-    setTwofaError("");
-    setError?.("");
-  }, [setError]);
+  /** ---------------------
+   *  Modal error (auto-clear)
+   * ----------------------*/
+  const showModalError = useCallback((msg) => {
+    setTwofaError(msg);
+    clearTimeout(modalErrorTimer.current);
+    modalErrorTimer.current = setTimeout(() => {
+      setTwofaError("");
+    }, ERROR_DISPLAY_TIME);
+  }, []);
 
-  const showTemporaryError = useCallback(
-    (message, duration = ERROR_DISPLAY_TIME) => {
-      setTwofaError(message);
-      setError?.(message);
+  /** ---------------------
+   *  UI success message (auto-clear)
+   * ----------------------*/
+  const showUISuccess = useCallback(
+    (msg) => {
+      if (!setUIMessage) return;
 
-      if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
-      errorTimeoutRef.current = setTimeout(clearErrors, duration);
+      setUIMessage(msg);
+      clearTimeout(uiSuccessTimer.current);
+
+      uiSuccessTimer.current = setTimeout(() => {
+        setUIMessage("");
+      }, ERROR_DISPLAY_TIME);
     },
-    [setError, clearErrors]
+    [setUIMessage]
   );
 
-  const showTemporarySuccess = useCallback(
-    (message, duration = ERROR_DISPLAY_TIME) => {
-      setError?.(message);
-
-      if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
-      errorTimeoutRef.current = setTimeout(() => setError?.(""), duration);
-    },
-    [setError]
-  );
-
-  // API calls with better error handling
+  /** ---------------------
+   *  API wrapper
+   * ----------------------*/
   const fetchAPI = useCallback(
     async (url, options = {}) => {
       const response = await fetch(url, {
@@ -66,162 +67,152 @@ export function use2FA(token, setError) {
         ...options,
       });
 
-      if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
-        throw new Error(
-          data.message || `API request failed: ${response.status}`
-        );
-      }
-
-      return await response.json();
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.message || "API error");
+      return data;
     },
     [token]
   );
 
-  // Fetch 2FA status with caching consideration
-  const fetch2FAStatus = useCallback(async () => {
-    try {
-      const data = await fetchAPI(`${API_BASE}/2fa/status`);
-      setTwofaEnabled(data.enabled);
-    } catch (err) {
-      console.error("Failed to fetch 2FA status:", err);
-    }
-  }, [fetchAPI]);
+  /** ---------------------
+   *  Load 2FA status
+   * ----------------------*/
+  useEffect(() => {
+    if (!token) return;
+    (async () => {
+      try {
+        const data = await fetchAPI(`${API_BASE}/2fa/status`);
+        setTwofaEnabled(data.enabled);
+      } catch {}
+    })();
+  }, [token, fetchAPI]);
 
-  // Enable 2FA
+  /** ---------------------
+   *  Enable 2FA
+   * ----------------------*/
   const handleEnable2FA = useCallback(async () => {
     try {
       setTwofaLoading(true);
-      setTwofaError("");
 
-      const data = await fetchAPI(`${API_BASE}/2fa/setup`, { method: "POST" });
-      setQrCode(data.qrCodeURL);
+      const { qrCodeURL } = await fetchAPI(`${API_BASE}/2fa/setup`, {
+        method: "POST",
+      });
+
+      setQrCode(qrCodeURL);
       setShow2FASetup(true);
 
-      return { success: true, qrCode: data.qrCodeURL };
+      return { success: true };
     } catch (err) {
-      console.error("Enable 2FA failed:", err);
-      setTwofaError(err.message);
-      return { success: false, error: err.message };
+      showModalError("Failed to setup 2FA.");
+      return { success: false };
     } finally {
       setTwofaLoading(false);
     }
-  }, [fetchAPI]);
+  }, [fetchAPI, showModalError]);
 
-  // Verify 2FA Code
+  /** ---------------------
+   *  Verify 2FA
+   * ----------------------*/
   const handleVerify2FA = useCallback(
-    async (verificationCode) => {
+    async (code) => {
       try {
         setTwofaLoading(true);
-        setTwofaError("");
 
         await fetchAPI(`${API_BASE}/2fa/verify`, {
           method: "POST",
-          body: JSON.stringify({ token: verificationCode }),
+          body: JSON.stringify({ token: code }),
         });
 
         setTwofaEnabled(true);
         setShow2FASetup(false);
         setQrCode(null);
-        showTemporarySuccess("2FA enabled successfully!");
+
+        showUISuccess("2FA enabled successfully!");
 
         return { success: true };
       } catch (err) {
-        console.error("Verify 2FA failed:", err);
-        setTwofaError(err.message);
-        return { success: false, error: err.message };
+        const msg = err.message.includes("invalid")
+          ? "Invalid TOTP code."
+          : "Verification failed.";
+        showModalError(msg);
+        return { success: false };
       } finally {
         setTwofaLoading(false);
       }
     },
-    [fetchAPI, showTemporarySuccess]
+    [fetchAPI, showModalError, showUISuccess]
   );
 
-  // Disable 2FA with Password Verification
+  /** ---------------------
+   *  Disable 2FA
+   * ----------------------*/
   const handleDisable2FA = useCallback(
-    async (password = "") => {
-      // If no password provided, show password modal
+    async (password) => {
       if (!password) {
         setShowDisable2FAModal(true);
-        setTwofaError("");
         return { success: false, requiresPassword: true };
       }
 
       try {
         setTwofaLoading(true);
-        setTwofaError("");
-        setError("");
 
-        // Get salt and derive auth proof
         const { salt } = await fetchAPI(`${API_BASE}/premium/salt`);
         const { deriveAuthProof } = await import("../crypto/crypto.js");
+
         const authProof = await deriveAuthProof(password, salt, "auth");
 
-        // Disable 2FA
         await fetchAPI(`${API_BASE}/2fa/disable`, {
           method: "POST",
           body: JSON.stringify({ auth_proof: authProof }),
         });
 
-        // Success
         setTwofaEnabled(false);
         setShowDisable2FAModal(false);
-        showTemporarySuccess("🔓 2FA disabled successfully");
+
+        showUISuccess(" 2FA disabled successfully");
 
         return { success: true };
       } catch (err) {
-        console.error("Disable 2FA failed:", err);
-
-        // Auto-clear 2FA error after extended time
-        setTwofaError(err.message);
-        if (twofaErrorTimeoutRef.current)
-          clearTimeout(twofaErrorTimeoutRef.current);
-        twofaErrorTimeoutRef.current = setTimeout(
-          () => setTwofaError(""),
-          EXTENDED_ERROR_DISPLAY_TIME
-        );
-
-        return { success: false, error: err.message };
+        const msg = err.message.includes("password")
+          ? "Invalid password."
+          : "Failed to disable 2FA.";
+        showModalError(msg);
+        return { success: false };
       } finally {
         setTwofaLoading(false);
       }
     },
-    [fetchAPI, showTemporarySuccess, setError]
+    [fetchAPI, showModalError, showUISuccess]
   );
 
-  // Modal handlers
-  const close2FASetup = useCallback(() => {
+  /** ---------------------
+   *  Modal close handlers
+   * ----------------------*/
+  const close2FASetup = () => {
     setShow2FASetup(false);
-    setQrCode(null);
     setTwofaError("");
-  }, []);
+    clearTimeout(modalErrorTimer.current);
+  };
 
-  const closeDisable2FAModal = useCallback(() => {
+  const closeDisable2FAModal = () => {
     setShowDisable2FAModal(false);
-    clearErrors();
-  }, [clearErrors]);
+    setTwofaError("");
+    clearTimeout(modalErrorTimer.current);
+  };
 
-  // Effects
-  useEffect(() => {
-    if (token) {
-      fetch2FAStatus();
-    }
-  }, [token, fetch2FAStatus]);
-
-  // Memoized return values to prevent unnecessary re-renders
-  const returnValue = {
+  return {
     twofaEnabled,
     twofaLoading,
     qrCode,
     show2FASetup,
     showDisable2FAModal,
     twofaError,
+
     handleEnable2FA,
     handleVerify2FA,
     handleDisable2FA,
+
     close2FASetup,
     closeDisable2FAModal,
   };
-
-  return returnValue;
 }
