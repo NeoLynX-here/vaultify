@@ -366,7 +366,7 @@ export default function VaultItem({
           rel="noopener noreferrer"
           className="text-cyan-400 font-mono text-sm hover:text-pink-400 transition-colors duration-200 flex items-center gap-2 mb-4"
         >
-          <span className="material-icons text-base">link</span>
+          <span className="material-icons text-base">public</span>
           <span className="hidden sm:inline">PORTAL_ACCESS: </span>
           <span className="truncate flex-1">{displayLink}</span>
           {isLinkEncrypted && (

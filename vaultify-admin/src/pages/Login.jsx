@@ -18,7 +18,7 @@ export default function Login() {
 
     if (data.token) {
       sessionStorage.setItem("adminToken", data.token);
-      nav("/dashboard");
+      nav("/admin/dashboard");
     } else {
       setError(data.error || "Invalid admin credentials");
     }
